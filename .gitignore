@@ -1,0 +1,11 @@
+# デフォルトテーマ
+themes/twenty*/
+
+# アップロードファイル
+uploads/
+upgrade/
+languages/
+
+# その他
+*.log
+.DS_Store
