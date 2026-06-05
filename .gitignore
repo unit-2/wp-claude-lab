@@ -9,3 +9,5 @@ languages/
 # その他
 *.log
 .DS_Store
+index.php
+plugins/
