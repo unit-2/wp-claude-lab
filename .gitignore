@@ -25,9 +25,34 @@ plugins/*/node_modules/
 # WordPress 設定（機密情報を含む）
 wp-config.php
 wp-config-local.php
+local-*.php
 .env
 .env.*
 .env.local
+
+# 証明書・秘密鍵
+*.pem
+*.key
+id_rsa*
+
+# データベースダンプ（漏洩リスク大）
+*.sql
+*.sql.gz
+
+# ログファイル（パス・クエリ・エラーが含まれる）
+wp-content/debug.log
+error_log
+php_error.log
+
+# Composer 認証情報
+auth.json
+
+# バックアップファイル（古い wp-config.php が含まれることがある）
+*.bak
+*.backup
+
+# IDE
+.idea/
 
 # Claude Code 個人設定（コミットしない）
 CLAUDE.local.md
