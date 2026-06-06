@@ -12,8 +12,7 @@ for PROTECTED_BRANCH in $PROTECTED; do
     echo "   本当に続けますか？ [y/N]"
     echo ""
 
-    exec < /dev/tty
-    read ANSWER
+    read ANSWER < /dev/tty
 
     case $ANSWER in
       "Y" | "y" | "yes" | "Yes" | "YES" )
