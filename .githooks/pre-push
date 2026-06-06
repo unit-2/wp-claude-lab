@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# main / master への直接プッシュを警告する
+
+PROTECTED="main master"
+
+while read LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA; do
+  REMOTE_BRANCH="${REMOTE_REF##refs/heads/}"
+
+  for PROTECTED_BRANCH in $PROTECTED; do
+    if [ "$REMOTE_BRANCH" = "$PROTECTED_BRANCH" ]; then
+      echo ""
+      echo "⚠️  [WARNING] $PROTECTED_BRANCH ブランチに直接プッシュしようとしています。"
+      echo "   本当に続けますか？ [y/N]"
+      echo ""
+
+      read ANSWER < /dev/tty
+
+      case $ANSWER in
+        "Y" | "y" | "yes" | "Yes" | "YES" )
+          echo "OK. プッシュを続けます。"
+          ;;
+        * )
+          echo "プッシュをキャンセルしました。"
+          exit 1
+          ;;
+      esac
+    fi
+  done
+done

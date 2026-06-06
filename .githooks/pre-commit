@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# main / master への直接コミットを警告する
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+PROTECTED="main master"
+
+for PROTECTED_BRANCH in $PROTECTED; do
+  if [ "$BRANCH" = "$PROTECTED_BRANCH" ]; then
+    echo ""
+    echo "⚠️  [WARNING] $PROTECTED_BRANCH ブランチに直接コミットしようとしています。"
+    echo "   本当に続けますか？ [y/N]"
+    echo ""
+
+    exec < /dev/tty
+    read ANSWER
+
+    case $ANSWER in
+      "Y" | "y" | "yes" | "Yes" | "YES" )
+        echo "OK. コミットを続けます。"
+        ;;
+      * )
+        echo "コミットをキャンセルしました。"
+        exit 1
+        ;;
+    esac
+  fi
+done

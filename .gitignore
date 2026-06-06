@@ -6,8 +6,30 @@ uploads/
 upgrade/
 languages/
 
+# Composer
+vendor/
+
+# PHPUnit
+.phpunit.cache/
+
 # その他
 *.log
 .DS_Store
 index.php
-plugins/
+
+# プラグイン（サードパーティは除外、自作プラグインはコミット対象）
+plugins/*/vendor/
+plugins/*/node_modules/
+
+# WordPress 設定（機密情報を含む）
+wp-config.php
+wp-config-local.php
+.env
+.env.*
+.env.local
+
+# Claude Code 個人設定（コミットしない）
+CLAUDE.local.md
+.claude/settings.json
+.claude/settings.local.json
+.mcp.json

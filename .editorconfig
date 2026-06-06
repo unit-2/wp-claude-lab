@@ -1,0 +1,45 @@
+# EditorConfig — https://editorconfig.org
+# チーム全員のエディタで自動適用される共通設定
+
+root = true
+
+# 全ファイル共通
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# PHP — WordPress はタブ
+[*.php]
+indent_style = tab
+indent_size = 4
+
+# JavaScript / TypeScript
+[*.{js,jsx,ts,tsx,mjs,cjs}]
+indent_style = tab
+indent_size = 2
+
+# CSS / SCSS
+[*.{css,scss}]
+indent_style = tab
+indent_size = 2
+
+# JSON — スペース2つ（WordPress の block.json 等に合わせる）
+[*.json]
+indent_style = space
+indent_size = 2
+
+# YAML
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# Markdown — 末尾スペースはそのまま（改行に使うため）
+[*.md]
+trim_trailing_whitespace = false
+
+# WordPress テーマ設定ファイル
+[theme.json]
+indent_style = space
+indent_size = 2

@@ -1,0 +1,11 @@
+parameters:
+  # レベル3: 型の不一致・未定義プロパティ・return型の不整合を検出
+  # 目標: 慣れたらレベル5へ上げる（0→3→5→8の段階的引き上げ）
+  level: 3
+  bootstrapFiles:
+    - bootstrap.php
+  excludePaths:
+    - */vendor/*
+    - */node_modules/*
+includes:
+  - phpstan-baseline.neon

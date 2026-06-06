@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "(tool == \"Edit\" || tool == \"Write\") && tool_input.file_path matches \"\\\\.php$\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ninput=$(cat)\n\n# jq の存在確認\nif ! command -v jq &>/dev/null; then\n  echo '[php-lint] jq が必要です。brew install jq でインストールしてください。' >&2\n  exit 1\nfi\n\nfile_path=$(printf '%s' \"$input\" | jq -r '.tool_input.file_path // \"\"')\n\n# PHP ファイル以外はスキップ\n[[ \"$file_path\" == *.php ]] || exit 0\n\n# パスの検証（インジェクション防止）\nif [[ ! \"$file_path\" =~ ^[a-zA-Z0-9_./:' '-]+$ ]]; then\n  echo '[php-lint] 不正なファイルパスを拒否しました' >&2\n  exit 1\nfi\n\n# composer.json があるディレクトリを上位に向かって探す\ndir=\"$(dirname \"$file_path\")\"\ncomposer_dir=\"\"\nwhile [ \"$dir\" != \"/\" ] && [ \"$dir\" != \".\" ]; do\n  if [ -f \"$dir/composer.json\" ]; then\n    composer_dir=\"$dir\"\n    break\n  fi\n  dir=\"$(dirname \"$dir\")\"\ndone\n\nif [ -z \"$composer_dir\" ]; then\n  echo \"[php-lint] composer.json が見つかりません\" >&2\n  exit 0\nfi\n\necho \"[php-lint] $file_path\" >&2\ncd \"$composer_dir\" && composer run php-lint \"$file_path\" 2>&1"
+          }
+        ]
+      }
+    ]
+  }
+}

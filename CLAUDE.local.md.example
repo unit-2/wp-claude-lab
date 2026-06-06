@@ -1,0 +1,40 @@
+# CLAUDE.local.md — ローカル個人設定
+
+このファイルは **各自のローカル環境に固有の設定** を書く場所です。
+`.gitignore` に登録済みのため、コミットされません。
+
+## セットアップ方法
+
+このファイルをコピーして `CLAUDE.local.md` を作成し、自分の環境に合わせて編集してください：
+
+```bash
+cp CLAUDE.local.md.example CLAUDE.local.md
+```
+
+## 書くべき内容の例
+
+- ローカルサイトの URL（人によって異なる）
+- 作業対象のテーマ / プラグイン名
+- 個人的な作業メモや補足
+- ローカル環境の特記事項
+
+## 書いてはいけないこと
+
+- **パスワード・API キー・シークレット** — このファイルも誤ってコミットされるリスクがある。秘密情報は `wp-config.php` や `.env` に記述し、それらが `.gitignore` に含まれていることを確認すること。
+- 共通のルール・規約（→ `AGENTS.md` と `rules/` に書く）
+- チーム全員に適用すべき設定（→ `AGENTS.md` に書く）
+
+---
+
+## このマシンの設定
+
+Site URL: https://your-site.local
+
+<!-- Backlog の課題番号プレフィックス（例: MYSITE）を書いておくと Claude が自動で付けてくれる -->
+Backlog Project Key: MYSITE
+
+<!-- 作業中の課題番号があれば書いておく -->
+Current Issue: MYSITE-42
+
+<!-- このプロジェクトの PR マージ先ブランチ（staging / main / master など） -->
+PR Target Branch: staging
