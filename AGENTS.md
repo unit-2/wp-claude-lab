@@ -100,16 +100,30 @@ composer run test
 3. **完了前**: `php-lint` + `phpstan` + `test` がエラーなしであることを確認
 4. **コミット**: Conventional Commits 形式（`feat:` / `fix:` / `refactor:` / `docs:` / `chore:`）
 
-## 指示がなくても必ず使うスキル
+## スキルを使うタイミング（必須）
 
-以下のタイミングでは、ユーザーから指示がなくても自動的に該当スキルを適用すること：
+以下の条件に該当したら、ユーザーからの指示を待たずに**必ずスキルを呼び出すこと**。
 
-| タイミング | スキル | 理由 |
-|-----------|--------|------|
-| 機能実装が完了したとき | `adversarial-reviewer` | バグ・ロジックミスの見落とし防止 |
-| コミット前 | `adversarial-reviewer` | 最終確認 |
-| 認証・権限・nonce・DB クエリに触れるコード | `security-review` | セキュリティ問題は後から直すコストが高い |
-| 設計・方針を決める前（「どちらを使うか」「どう実装するか」） | `adversarial-reviewer`（デビルズアドボケイト視点） | 採用前に弱点を洗い出す |
+### `adversarial-reviewer` を必ず呼び出す場面
+
+- PHPファイルの実装が1つ完了したとき
+- コミット前の最終確認
+- 「どちらの設計にするか」「どう実装するか」を判断する前（デビルズアドボケイト視点）
+
+### `security-review` を必ず呼び出す場面
+
+- `current_user_can()` / `wp_verify_nonce()` / `$wpdb` を含むコードを書いたとき
+- `register_rest_route()` でREST APIエンドポイントを登録したとき
+
+### `wp-block-themes` を必ず呼び出す場面
+
+- `templates/*.html` / `parts/*.html` を新規作成・編集するとき
+- `theme.json` を編集するとき
+
+### `wp-block-development` を必ず呼び出す場面
+
+- `block.json` を新規作成・編集するとき
+- カスタムブロックを新規作成するとき
 
 ## ディレクトリ構成
 

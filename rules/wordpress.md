@@ -161,6 +161,20 @@ register_rest_route( 'myplugin/v1', '/data', [
 ] );
 ```
 
+## ブロックテーマテンプレートの制約
+
+`templates/*.html` と `parts/*.html` は **PHPコードを含められない**。
+
+```html
+<!-- ❌ 動作しない -->
+<p><?php esc_html_e( 'Not found.', 'domain' ); ?></p>
+
+<!-- ✅ プレーンテキストで直接書く -->
+<p>見つかりませんでした。</p>
+```
+
+動的コンテンツが必要な場合はダイナミックブロック（`render.php`）を作成してテンプレートから呼び出す。
+
 ## File Organization
 
 - One class per file. File name must match class name in lowercase with hyphens (`class-my-plugin-settings.php`).

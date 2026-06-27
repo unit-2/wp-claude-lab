@@ -1,5 +1,19 @@
 # Git ワークフロー
 
+## コミットメッセージの言語
+
+- コミットメッセージは**英語**で書く
+- コード内コメントは日本語可
+
+```
+# 正しい例
+feat: add news CPT and archive template [MYSITE-42]
+fix: resolve nonce verification failure on post save [MYSITE-43]
+
+# 悪い例（日本語はNG）
+feat: ニュースCPTを追加 [MYSITE-42]
+```
+
 ## コミットメッセージ形式
 
 ```
