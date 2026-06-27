@@ -38,3 +38,32 @@ Current Issue: MYSITE-42
 
 <!-- このプロジェクトの PR マージ先ブランチ（staging / main / master など） -->
 PR Target Branch: staging
+
+## WP-CLI（Local by Flywheel 環境）
+
+Local by Flywheel のサイトでは、システムの `wp` コマンドは DB に接続できないため、
+Local が管理する PHP バイナリを使って WP-CLI を実行する必要がある。
+
+```bash
+# PHP バージョンを確認（実際のバージョン番号に合わせること）
+ls ~/Library/Application\ Support/Local/lightning-services/ | grep php
+
+# PHP パスを設定（バージョン番号を置き換える）
+PHP="$HOME/Library/Application Support/Local/lightning-services/php-8.2.30+1/bin/darwin-arm64/bin/php"
+
+# WP-CLI の実行例
+cd "/Users/yourname/Local Sites/mysite/app/public"
+"$PHP" /opt/homebrew/bin/wp post list --post_type=page
+"$PHP" /opt/homebrew/bin/wp rewrite flush
+```
+
+詳細: `skills/wp-wpcli-and-ops/references/local-environment.md`
+
+## コミット前フラグ
+
+コミット前チェック（adversarial-reviewer 実行後）に必要なフラグのパス確認：
+
+```bash
+# このプロジェクトのフラグパスを確認
+echo "/tmp/wp-review-ok-$(echo "$PWD" | md5 -q 2>/dev/null || echo "$PWD" | md5sum | cut -c1-8)"
+```

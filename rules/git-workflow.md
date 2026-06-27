@@ -14,6 +14,25 @@ fix: resolve nonce verification failure on post save [MYSITE-43]
 feat: ニュースCPTを追加 [MYSITE-42]
 ```
 
+## コミット前チェックフロー
+
+`git commit` を実行しようとすると、フックが自動的にブロックする。以下の手順で進めること：
+
+```bash
+# 1. phpstan を実行してエラーゼロを確認
+composer run phpstan <target>
+
+# 2. adversarial-reviewer スキルでコードをレビュー（Claude Codeで実行）
+
+# 3. レビュー完了後、確認フラグを立てる
+#    PROJECT_HASH は以下で確認できる
+echo "$PWD" | md5 -q 2>/dev/null || echo "$PWD" | md5sum | cut -c1-8
+touch /tmp/wp-review-ok-<PROJECT_HASH>
+
+# 4. git commit を再実行 → フックが許可する
+git commit -m "feat: ..."
+```
+
 ## コミットメッセージ形式
 
 ```

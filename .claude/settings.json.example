@@ -15,7 +15,54 @@
         "hooks": [
           {
             "type": "command",
-            "command": "#!/bin/bash\ninput=$(cat)\n\nif ! command -v jq &>/dev/null; then exit 0; fi\n\nfile_path=$(printf '%s' \"$input\" | jq -r '.tool_input.file_path // \"\"')\n[[ \"$file_path\" == *.php ]] || exit 0\n[[ -f \"$file_path\" ]] || exit 0\n\ncontent=$(cat \"$file_path\")\nfound=()\n\ngrep -q 'current_user_can'   <<< \"$content\" && found+=(\"current_user_can\")\ngrep -q 'wp_verify_nonce'    <<< \"$content\" && found+=(\"wp_verify_nonce\")\ngrep -q '\\$wpdb'             <<< \"$content\" && found+=(\"\\$wpdb\")\ngrep -q 'register_rest_route' <<< \"$content\" && found+=(\"register_rest_route\")\n\nif [ ${#found[@]} -gt 0 ]; then\n  keywords=$(IFS=', '; echo \"${found[*]}\")\n  echo \"[security-alert] $file_path にセキュリティ関連キーワードが含まれています: $keywords\"\n  echo \"security-review スキルを使ってセキュリティ確認を行ってください。\"\nfi"
+            "command": "#!/bin/bash\ninput=$(cat)\n\nif ! command -v jq &>/dev/null; then exit 0; fi\n\nfile_path=$(printf '%s' \"$input\" | jq -r '.tool_input.file_path // \"\"')\n[[ \"$file_path\" == *.php ]] || exit 0\n[[ -f \"$file_path\" ]] || exit 0\n\ncontent=$(cat \"$file_path\")\nfound=()\n\ngrep -q 'current_user_can'    <<< \"$content\" && found+=(\"current_user_can\")\ngrep -q 'wp_verify_nonce'     <<< \"$content\" && found+=(\"wp_verify_nonce\")\ngrep -q '\\$wpdb'              <<< \"$content\" && found+=(\"\\$wpdb\")\ngrep -q 'register_rest_route' <<< \"$content\" && found+=(\"register_rest_route\")\n\nif [ ${#found[@]} -gt 0 ]; then\n  keywords=$(IFS=', '; echo \"${found[*]}\")\n  echo \"[security-alert] $file_path にセキュリティ関連キーワードが含まれています: $keywords\"\n  echo \"security-review スキルを使ってセキュリティ確認を行ってください。\"\nfi\n\n# register_rest_route 検知時は wp-rest-api ルールも注入\nif grep -q 'register_rest_route' <<< \"$content\"; then\n  echo \"\"\n  echo \"=== [wp-rest-api] REST API 必須ルール ===\"\n  echo \"・permission_callback を必ず実装する（省略不可）\"\n  echo \"・公開エンドポイントは __return_true に '// 意図的に公開' コメントを付ける\"\n  echo \"・引数は args で validate_callback / sanitize_callback を定義する\"\n  echo \"・レスポンスは WP_REST_Response を返す。エラーは WP_Error を使う\"\nfi\n\n# Interactivity API 検知時はルールを注入\nif grep -qE 'data-wp-|wp_interactivity_state' <<< \"$content\"; then\n  echo \"\"\n  echo \"=== [wp-interactivity-api] Interactivity API 必須ルール ===\"\n  echo \"・store() は viewScriptModule（ESM）から呼ぶ。viewScript からは呼ばない\"\n  echo \"・state は wp_interactivity_state() でサーバーサイドから初期値を渡す\"\n  echo \"・data-wp-interactive 属性に namespace を必ず指定する\"\n  echo \"・コンテキストは data-wp-context で定義し、useContext() で読む\"\nfi"
+          }
+        ]
+      },
+      {
+        "matcher": "(tool == \"Edit\" || tool == \"Write\") && tool_input.file_path matches \"\\\\.html$\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ninput=$(cat)\n\nif ! command -v jq &>/dev/null; then exit 0; fi\n\nfile_path=$(printf '%s' \"$input\" | jq -r '.tool_input.file_path // \"\"')\n[[ \"$file_path\" == *.html ]] || exit 0\n\n# templates/ または parts/ 配下のみ対象\nif [[ \"$file_path\" != */templates/* ]] && [[ \"$file_path\" != */parts/* ]]; then\n  exit 0\nfi\n\n[[ -f \"$file_path\" ]] || exit 0\n\necho \"=== [wp-block-themes] ブロックテーマ必須ルール ===\"\necho \"・templates/*.html / parts/*.html は HTML のみ。PHP は書けない\"\necho \"・ブロックマークアップ: <!-- wp:block-name {attrs} --> ... <!-- /wp:block-name -->\"\necho \"・動的コンテンツ → ダイナミックブロック（render.php）で実装する\"\necho \"・template-part 参照: <!-- wp:template-part {\\\"slug\\\":\\\"header\\\"} /-->\"\n\n# PHP混入チェック\nif grep -q '<\\?php' \"$file_path\"; then\n  echo \"\"\n  echo \"[ERROR] PHPコードが含まれています。ブロックテーマテンプレートにPHPは使えません。\"\n  exit 1\nfi"
+          }
+        ]
+      },
+      {
+        "matcher": "(tool == \"Edit\" || tool == \"Write\") && tool_input.file_path matches \"block\\\\.json$\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ninput=$(cat)\n\nif ! command -v jq &>/dev/null; then exit 0; fi\n\nfile_path=$(printf '%s' \"$input\" | jq -r '.tool_input.file_path // \"\"')\n[[ \"$file_path\" == */block.json ]] || exit 0\n\necho \"=== [wp-block-development] ブロック開発必須ルール ===\"\necho \"・name は namespace/block-name 形式（例: myplugin/my-block）\"\necho \"・動的ブロックは render_callback または render.php を使う\"\necho \"・viewScript は非推奨。viewScriptModule（ESM）を使う（WP 6.5+）\"\necho \"・supports でブロックエディタ機能を明示的に有効化する\""
+          }
+        ]
+      },
+      {
+        "matcher": "(tool == \"Edit\" || tool == \"Write\") && tool_input.file_path matches \"\\\\.php$\" && tool_input.file_path matches \"/plugins/\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ninput=$(cat)\n\nif ! command -v jq &>/dev/null; then exit 0; fi\n\nfile_path=$(printf '%s' \"$input\" | jq -r '.tool_input.file_path // \"\"')\n[[ \"$file_path\" == *.php ]] || exit 0\n[[ \"$file_path\" == */plugins/* ]] || exit 0\n\necho \"=== [wp-plugin-development] プラグイン開発必須ルール ===\"\necho \"・プラグインヘッダーは main ファイルのみ。他ファイルに書かない\"\necho \"・activation/deactivation/uninstall フックは register_activation_hook() を使う\"\necho \"・オプション名・フック名・関数名にプラグインスラッグをプレフィックスする\"\necho \"・uninstall.php で必ずデータ削除処理を実装する\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "tool == \"Bash\" && tool_input.command matches \"git commit\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ninput=$(cat)\n\n# コミットコマンドかチェック\nif ! command -v jq &>/dev/null; then exit 0; fi\ncommand=$(printf '%s' \"$input\" | jq -r '.tool_input.command // \"\"')\n[[ \"$command\" == *\"git commit\"* ]] || exit 0\n\n# プロジェクト固有フラグ（複数プロジェクト干渉防止）\nPROJECT_HASH=$(echo \"$PWD\" | md5 -q 2>/dev/null || echo \"$PWD\" | md5sum | cut -c1-8)\nFLAG=\"/tmp/wp-review-ok-${PROJECT_HASH}\"\n\nif [ ! -f \"$FLAG\" ]; then\n  echo \"⛔ コミット前チェック未完了\"\n  echo \"\"\n  echo \"=== [adversarial-reviewer] 確認必須項目 ===\"\n  echo \"□ ロジック: 条件の逆転・nullチェック漏れ・オフバイワンはないか\"\n  echo \"□ セキュリティ: エスケープ・nonce・権限チェックはすべて揃っているか\"\n  echo \"□ WordPress: prepare()なしのSQLはないか。プレフィックスは付いているか\"\n  echo \"□ 型安全: 型宣言・戻り値型・phpstan がパスするか（composer run phpstan <target>）\"\n  echo \"\"\n  echo \"確認完了後: touch $FLAG\"\n  echo \"その後 git commit を再実行してください\"\n  exit 1\nfi\n\nrm \"$FLAG\"\necho \"[pre-commit] チェック確認済み。コミットを続行します。\""
+          }
+        ]
+      },
+      {
+        "matcher": "tool == \"Bash\" && (tool_input.command matches \"/bin/wp \" || tool_input.command matches \"' wp '\")",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ninput=$(cat)\n\nif ! command -v jq &>/dev/null; then exit 0; fi\ncommand=$(printf '%s' \"$input\" | jq -r '.tool_input.command // \"\"')\n\n# wp コマンドを含む場合のみ\nif [[ \"$command\" != *\"/bin/wp \"* ]] && [[ \"$command\" != *\" wp \"* ]]; then\n  exit 0\nfi\n\necho \"=== [wp-wpcli-and-ops] WP-CLI 実行前チェック ===\"\necho \"・本番環境では --dry-run で先に確認する\"\necho \"・search-replace は必ず --dry-run を先に実行する\"\necho \"・Local環境では system の wp コマンドは使えない。LocalのPHPパスを使う\"\necho \"  → skills/wp-wpcli-and-ops/references/local-environment.md を参照\""
           }
         ]
       }

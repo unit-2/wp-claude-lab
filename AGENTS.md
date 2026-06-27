@@ -100,9 +100,48 @@ composer run test
 3. **完了前**: `php-lint` + `phpstan` + `test` がエラーなしであることを確認
 4. **コミット**: Conventional Commits 形式（`feat:` / `fix:` / `refactor:` / `docs:` / `chore:`）
 
+## 開発プロトコル（必ず従うこと）
+
+### 作業開始前（新機能・新CPT・新テンプレートを作るとき）
+
+- **`wp-project-triage` スキルを必ず使う** — リポジトリの種別・構成を把握してから設計する
+- **`wordpress-router` スキルを使う** — 作業ドメインに合った別スキルへ誘導してもらう
+
+### 新しいビジネスロジッククラスを作るとき
+
+- **`tdd-workflow` スキルに従う** — テストを先に書く（RED → GREEN → IMPROVE）
+
+### PHP実装が1ファイル完了したとき（必須）
+
+- **`adversarial-reviewer` スキルを必ず呼び出す**（ユーザーの指示不要）
+- CRITICAL・HIGH は修正してから次に進む
+
+### セキュリティ関連コードを書いたとき（必須）
+
+- **`security-review` スキルを必ず呼び出す**
+- フックが `[security-alert]` を出力したら即座に実行する
+
+### コミット前（必須）
+
+1. `composer run phpstan <target>` を実行してエラーゼロを確認する
+2. `adversarial-reviewer` スキルでコードをレビューする
+3. `touch /tmp/wp-review-ok-<PROJECT_HASH>` を実行する（フックがブロックを解除する）
+4. `git commit` を実行する
+
+### パフォーマンス問題が出たとき
+
+- **`wp-performance` スキルを使う**
+
+### UI確認が必要なとき
+
+- **`agent-browser` スキルを使う**
+
+---
+
 ## スキルを使うタイミング（必須）
 
 以下の条件に該当したら、ユーザーからの指示を待たずに**必ずスキルを呼び出すこと**。
+フックが自動的にルールを注入するが、スキルの詳細が必要なときは明示的に呼び出す。
 
 ### `adversarial-reviewer` を必ず呼び出す場面
 
