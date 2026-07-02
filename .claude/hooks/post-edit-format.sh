@@ -11,7 +11,7 @@ FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WP_CONTENT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-# prettier 対象（theme.json / assets/ は .prettierignore で除外済み）
+# prettier / stylelint 対象（theme.json / assets/ は .prettierignore で除外済み）
 if [[ "$FILE_PATH" =~ \.(html|js|mjs|scss)$ ]]; then
   # prettier がインストールされているテーマ・プラグインのルートを探す
   DIR="$(dirname "$FILE_PATH")"
@@ -25,6 +25,11 @@ if [[ "$FILE_PATH" =~ \.(html|js|mjs|scss)$ ]]; then
   done
 
   if [ -n "$PKG_DIR" ]; then
+    # SCSS: stylelint → prettier の順（stylelintで修正後にprettierで整形）
+    if [[ "$FILE_PATH" =~ \.scss$ ]]; then
+      echo "[format] stylelint: $FILE_PATH" >&2
+      cd "$PKG_DIR" && npx stylelint --fix "$FILE_PATH" 2>&1 | grep -v "^$" >&2 || true
+    fi
     echo "[format] prettier: $FILE_PATH" >&2
     cd "$PKG_DIR" && npx prettier --write "$FILE_PATH" 2>&1 | grep -v "^$" >&2 || true
   fi
