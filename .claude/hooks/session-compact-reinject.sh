@@ -4,6 +4,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WP_CONTENT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+CLAUDE_DIR="$WP_CONTENT_DIR/.claude"
 
 echo "=== [wp-claude-lab] コンテキスト圧縮後の WordPress 必須ルール再注入 ==="
 echo ""
@@ -24,4 +25,21 @@ echo "2. touch /tmp/wp-review-ok-\$(echo \"\$PWD\" | md5 -q 2>/dev/null || echo 
 echo "3. git commit"
 echo ""
 echo "詳細は CLAUDE.md / rules/ を参照してください。"
+
+# settings.json.example と settings.json の差分チェック
+if [[ -f "$CLAUDE_DIR/settings.json.example" ]] && [[ -f "$CLAUDE_DIR/settings.json" ]]; then
+  DIFF=$(diff "$CLAUDE_DIR/settings.json.example" "$CLAUDE_DIR/settings.json" 2>/dev/null)
+  if [[ -n "$DIFF" ]]; then
+    echo ""
+    echo "⚠️  [settings] settings.json.example が更新されています。"
+    echo "以下のコマンドで差分を確認して、settings.json に手動でマージしてください："
+    echo "  diff .claude/settings.json.example .claude/settings.json"
+  fi
+elif [[ -f "$CLAUDE_DIR/settings.json.example" ]] && [[ ! -f "$CLAUDE_DIR/settings.json" ]]; then
+  echo ""
+  echo "⚠️  [settings] settings.json が存在しません。フックが動いていない可能性があります。"
+  echo "  cp .claude/settings.json.example .claude/settings.json"
+  echo "  chmod +x .claude/hooks/*.sh"
+fi
+
 exit 0
