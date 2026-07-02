@@ -12,10 +12,16 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WP_CONTENT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 SKILLS_DIR="$WP_CONTENT_DIR/skills"
 
-# ① templates/*.html / parts/*.html → wp-block-themes + PHP混入ブロック
+# ① templates/*.html / parts/*.html → wp-block-themes + html-coding + wp-html-accessibility + PHP混入ブロック
 if [[ "$FILE_PATH" =~ /templates/[^/]+\.html$ ]] || [[ "$FILE_PATH" =~ /parts/[^/]+\.html$ ]]; then
   echo "=== [wp-block-themes] テンプレート編集前チェック ==="
   [[ -f "$SKILLS_DIR/wp-block-themes/key-rules.md" ]] && cat "$SKILLS_DIR/wp-block-themes/key-rules.md"
+  echo ""
+  echo "=== [html-coding] HTML コーディング規約 ==="
+  [[ -f "$SKILLS_DIR/html-coding/key-rules.md" ]] && cat "$SKILLS_DIR/html-coding/key-rules.md"
+  echo ""
+  echo "=== [wp-html-accessibility] WordPress アクセシビリティ ==="
+  [[ -f "$SKILLS_DIR/wp-html-accessibility/key-rules.md" ]] && cat "$SKILLS_DIR/wp-html-accessibility/key-rules.md"
 
   # 新規コンテンツに <?php が含まれていたらブロック
   NEW_CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // .tool_input.content // ""')
@@ -24,6 +30,16 @@ if [[ "$FILE_PATH" =~ /templates/[^/]+\.html$ ]] || [[ "$FILE_PATH" =~ /parts/[^
     echo "動的コンテンツが必要な場合はダイナミックブロック（render.php）を使ってください。" >&2
     exit 2
   fi
+  exit 0
+fi
+
+# ①-b その他の .html ファイル → html-coding + wp-html-accessibility
+if [[ "$FILE_PATH" =~ \.html$ ]]; then
+  echo "=== [html-coding] HTML コーディング規約 ==="
+  [[ -f "$SKILLS_DIR/html-coding/key-rules.md" ]] && cat "$SKILLS_DIR/html-coding/key-rules.md"
+  echo ""
+  echo "=== [wp-html-accessibility] WordPress アクセシビリティ ==="
+  [[ -f "$SKILLS_DIR/wp-html-accessibility/key-rules.md" ]] && cat "$SKILLS_DIR/wp-html-accessibility/key-rules.md"
   exit 0
 fi
 
