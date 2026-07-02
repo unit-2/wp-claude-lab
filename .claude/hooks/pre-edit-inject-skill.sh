@@ -50,10 +50,27 @@ if [[ "$FILE_PATH" =~ /blocks/ ]] || [[ "$FILE_PATH" =~ /block\.json$ ]]; then
   exit 0
 fi
 
-# ③ plugins/ 配下の PHP → wp-plugin-development
+# ③ plugins/ 配下の PHP → wp-plugin-development + 重複チェック
 if [[ "$FILE_PATH" =~ /plugins/.*\.php$ ]]; then
   echo "=== [wp-plugin-development] プラグイン編集前チェック ==="
   [[ -f "$SKILLS_DIR/wp-plugin-development/key-rules.md" ]] && cat "$SKILLS_DIR/wp-plugin-development/key-rules.md"
+  echo ""
+  echo "=== [重複コード確認] 実装前に既存コードを確認してください ==="
+  PLUGIN_DIR=$(echo "$FILE_PATH" | grep -oE '.*/plugins/[^/]+')
+  echo "・このプラグイン内に同じ処理をする関数・クエリがすでにないか確認する"
+  echo "・確認方法: grep -rn '関数名キーワード' $PLUGIN_DIR"
+  echo "・WP_Query / \$wpdb クエリは特に重複しやすい。既存のものを再利用すること"
+  exit 0
+fi
+
+# ③-b themes/ 配下の PHP → 重複チェック
+if [[ "$FILE_PATH" =~ /themes/.*\.php$ ]]; then
+  echo "=== [重複コード確認] 実装前に既存コードを確認してください ==="
+  THEME_DIR=$(echo "$FILE_PATH" | grep -oE '.*/themes/[^/]+')
+  echo "・このテーマ内に同じ処理をする関数・クエリがすでにないか確認する"
+  echo "・確認方法: grep -rn '関数名キーワード' $THEME_DIR"
+  echo "・WP_Query / get_posts は特に重複しやすい。既存のものを再利用すること"
+  echo "・テンプレートタグ（get_header / get_footer 等）は WordPress コアを使う"
   exit 0
 fi
 
