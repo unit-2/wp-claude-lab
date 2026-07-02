@@ -9,7 +9,6 @@ FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
 [[ -f "$FILE_PATH" ]] || exit 0
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-WP_CONTENT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # prettier / stylelint 対象（theme.json / assets/ は .prettierignore で除外済み）
 if [[ "$FILE_PATH" =~ \.(html|js|mjs|scss)$ ]]; then
