@@ -1,4 +1,28 @@
 {
+  "permissions": {
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)",
+      "Write(.env)",
+      "Write(.env.*)",
+      "Write(**/.env)",
+      "Write(**/.env.*)",
+      "Read(wp-config.php)",
+      "Read(**/wp-config.php)",
+      "Edit(wp-config.php)",
+      "Edit(**/wp-config.php)",
+      "Write(wp-config.php)",
+      "Write(**/wp-config.php)",
+      "Bash(* .env*)",
+      "Bash(* wp-config.php*)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
