@@ -4,6 +4,11 @@ description: "Use when the user asks about WordPress codebases (plugins, themes,
 compatibility: "Targets WordPress 6.9+ (PHP 7.2.24+). Filesystem-based agent with bash + node. Some workflows require WP-CLI."
 ---
 
+## 役割境界
+
+リポジトリ分類は `wp-project-triage` の `detect_wp_project.mjs` に委譲する。
+本スキルは分類結果から作業スキルへの誘導を担う。
+
 # WordPress Router
 
 ## When to use

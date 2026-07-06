@@ -2,7 +2,8 @@
 
 ## 必須確認コマンド
 
-PHP ファイルを変更したら必ず以下を実行すること（`wp-content/` ディレクトリから）：
+編集時は `.claude/hooks/post-edit-format.sh` が php-lint を自動実行する。
+リリース前・PR 前に全体チェックとして以下を手動実行する（`wp-content/` ディレクトリから）：
 
 ```bash
 # WPCS コーディング規約チェック（<target> は対象のテーマ/プラグインパス）
@@ -27,8 +28,7 @@ composer run php-compatibility <target>
 
 ## General
 
-- PHP 7.4+ features are allowed (typed properties, arrow functions, null coalescing assignment).
-- PHP 8.0+ features (named arguments, match expressions, nullsafe operator) are allowed when the target environment supports it.
+- PHP 8.1+ を前提とする（composer.json の `php: >=8.1` に一致）。8.2+ の機能は対象環境が対応している場合のみ使う。
 - `strict_types=1` は**新規クラスファイルのみ**に宣言する。テンプレートファイル・functions.php・WordPress フック関数を含むファイルには付けない（WordPress コア関数が型強制に依存しているため TypeError が発生する場合がある）。
 
 ```php

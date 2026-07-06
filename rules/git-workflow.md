@@ -156,10 +156,9 @@ git merge-tree HEAD origin/staging
    - フェーズに分けて整理する
 
 2. **TDD（テスト駆動開発）**
-   - `tdd-workflow` スキルを使う
+   - `rules/testing.md` と `tdd-workflow` スキルに従う（RED→GREEN→IMPROVE の手順・カバレッジ目標は
+     `rules/testing.md` を正本とする）
    - スキルの呼び出し方：チャットで「`/tdd-workflow` を使って実装して」と指示する
-   - テストを先に書く（RED）→ 実装する（GREEN）→ リファクタリング（IMPROVE）
-   - カバレッジ（ビジネスロジック層）80%+ を確認する
 
 3. **コードレビュー**
    - `adversarial-reviewer` スキルでコードを書いた直後にレビューする

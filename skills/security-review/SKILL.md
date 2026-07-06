@@ -4,6 +4,11 @@ description: Use this skill when adding authentication, handling user input, wor
 when_to_use: Use when code touches authentication, secrets, user input, file uploads, payments, third-party APIs, or other sensitive surfaces.
 ---
 
+## 役割境界
+
+セキュリティ観点の事前チェックリスト。コードを書く前・書いた直後に使う。
+完成コード全体のバグハントは `adversarial-reviewer` に委ねる。
+
 # Security Review Skill
 
 Ensures all code follows security best practices and identifies potential vulnerabilities.
