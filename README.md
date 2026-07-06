@@ -117,7 +117,7 @@ wp-content/
 │   ├── security.md            ← セキュリティルール
 │   ├── testing.md             ← テスト方針
 │   └── git-workflow.md        ← コミット・PR の作法
-├── skills/                    ← Claude 向けスキル（17種）
+├── skills/                    ← Claude 向けスキル（19種）
 │   ├── wp-block-themes/       ← FSE・theme.json・Site Editor
 │   ├── wp-block-development/  ← ブロック開発
 │   ├── wp-plugin-development/ ← プラグイン開発
@@ -170,7 +170,7 @@ wp-content/
 3. PHP を書いたら自動で `php-lint` が走る
 4. 完了前に `composer run phpstan <target>` を実行する
 
-## スキル一覧（17種）
+## スキル一覧（19種）
 
 | スキル | 用途 |
 |--------|------|
@@ -191,3 +191,5 @@ wp-content/
 | `security-review` | セキュリティチェック |
 | `tdd-workflow` | テスト駆動開発 |
 | `agent-browser` | ブラウザ自動操作・UI 確認 |
+| `html-coding` | HTML コーディング規約 |
+| `wp-html-accessibility` | WordPress アクセシビリティ |

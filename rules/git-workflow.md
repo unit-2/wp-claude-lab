@@ -19,19 +19,26 @@ feat: ニュースCPTを追加 [MYSITE-42]
 `git commit` を実行しようとすると、フックが自動的にブロックする。以下の手順で進めること：
 
 ```bash
-# 1. phpstan を実行してエラーゼロを確認
-composer run phpstan <target>
+# 1. wp-review.sh でコミット前チェックを一括実行する
+#    phpstan の実行 → adversarial-reviewer チェックリストの確認 → 確認フラグの付与、を1コマンドで行う
+bash bin/wp-review.sh <target>
 
-# 2. adversarial-reviewer スキルでコードをレビュー（Claude Codeで実行）
-
-# 3. レビュー完了後、確認フラグを立てる
-#    PROJECT_HASH は以下で確認できる
-echo "$PWD" | md5 -q 2>/dev/null || echo "$PWD" | md5sum | cut -c1-8
-touch /tmp/wp-review-ok-<PROJECT_HASH>
-
-# 4. git commit を再実行 → フックが許可する
+# 2. git commit を再実行 → フックが許可する
 git commit -m "feat: ..."
 ```
+
+> **フォールバック**：`bin/wp-review.sh` が使えない環境では、以下を手動で行う。
+> ```bash
+> # 1. phpstan を実行してエラーゼロを確認
+> composer run phpstan <target>
+>
+> # 2. adversarial-reviewer スキルでコードをレビュー（Claude Codeで実行）
+>
+> # 3. レビュー完了後、確認フラグを立てる
+> #    PROJECT_HASH は以下で確認できる
+> echo "$PWD" | md5 -q 2>/dev/null || echo "$PWD" | md5sum | cut -c1-8
+> touch /tmp/wp-review-ok-<PROJECT_HASH>
+> ```
 
 ## コミットメッセージ形式
 
@@ -44,6 +51,8 @@ git commit -m "feat: ..."
 - タイプ一覧: feat, fix, refactor, docs, test, chore, perf, ci
 - **Backlog の課題番号を末尾に必ず付ける**（`[PROJECT-123]` 形式）
 - プロジェクトキーは案件ごとに異なる。`CLAUDE.local.md` に記載しておくと便利
+- **適用範囲**：課題番号の付与はクライアント案件リポジトリでは必須。このベース環境（wp-claude-lab）
+  自体の開発では課題番号は不要
 
 ```
 # 良い例
