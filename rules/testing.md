@@ -37,8 +37,8 @@ composer install
   `npm i -g bats` で各自の開発環境に用意する前提とする
 - 実行コマンド:
   ```bash
-  node --test "tests/**/*.test.mjs"   # detect_wp_project.mjs 等
-  composer run test:hooks             # bats 未導入なら案内を出してスキップする
+  node --test "skills/**/tests/*.test.mjs"   # detect_wp_project.mjs 等
+  composer run test:hooks                    # bats 未導入なら案内を出してスキップする
   ```
 - 「カバレッジ 80%+」（下記）はテーマ・プラグインのビジネスロジック層に適用される目標であり、
   基盤スクリプトについては全フックにスモークテスト（正常系・代表的な異常系）があることを基準とする

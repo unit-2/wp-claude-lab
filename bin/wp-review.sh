@@ -5,7 +5,7 @@
 #   bash bin/wp-review.sh <target>
 #
 # 例:
-#   bash bin/wp-review.sh themes/vga
+#   bash bin/wp-review.sh themes/wp-claude-lab
 #   bash bin/wp-review.sh plugins/my-plugin
 #
 # staged 内容のダイジェストと確認時刻をフラグに記録する。pre-git-commit.sh は
@@ -20,7 +20,7 @@ TARGET="${1:-}"
 
 if [[ -z "$TARGET" ]]; then
   echo "使い方: bash bin/wp-review.sh <target>"
-  echo "例:     bash bin/wp-review.sh themes/vga"
+  echo "例:     bash bin/wp-review.sh themes/wp-claude-lab"
   exit 1
 fi
 

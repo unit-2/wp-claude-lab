@@ -21,7 +21,8 @@ fi
 # search-replace は --dry-run なしでの実行を一旦ブロックする
 if [[ "$COMMAND" =~ wp[[:space:]]+search-replace ]] && [[ "$COMMAND" != *"--dry-run"* ]]; then
   echo "[ERROR] wp search-replace は --dry-run なしでは実行できません: $COMMAND" >&2
-  echo "まず --dry-run を付けて変更内容を確認してから、問題なければ --dry-run を外して再実行してください。" >&2
+  echo "まず --dry-run で変更内容を確認してください。本実行はこのフックが必ずブロックするため、" >&2
+  echo "問題なければターミナルから手動で --dry-run なしのコマンドを実行してください。" >&2
   exit 2
 fi
 
