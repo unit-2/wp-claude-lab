@@ -232,6 +232,7 @@ function detectKinds(repoRoot, signals) {
 
   if (signals.isGutenbergRepo) kinds.add("gutenberg");
   if (signals.isWpCoreCheckout) kinds.add("wp-core");
+  if (signals.isWpContentRoot) kinds.add("wp-content-root");
   if (signals.hasWpContentDir) kinds.add("wp-site");
   if (signals.detectedThemeName) kinds.add(signals.isBlockTheme ? "wp-block-theme" : "wp-theme");
   if (signals.detectedPluginName) kinds.add(signals.isBlockPlugin ? "wp-block-plugin" : "wp-plugin");
@@ -242,6 +243,7 @@ function detectKinds(repoRoot, signals) {
   const priority = [
     "gutenberg",
     "wp-core",
+    "wp-content-root",
     "wp-site",
     "wp-block-theme",
     "wp-block-plugin",
@@ -291,7 +293,13 @@ function buildRecommendations({ repoRoot, primaryKind, packageManager, packageJs
 function main() {
   const repoRoot = process.cwd();
 
-  const wpContent = path.join(repoRoot, "wp-content");
+  // Repo root is itself a wp-content directory (e.g. this repository) when it has
+  // plugins/ or themes/ directly and does not also contain a nested wp-content/.
+  const isWpContentRoot =
+    !existsDir(path.join(repoRoot, "wp-content")) &&
+    (existsDir(path.join(repoRoot, "plugins")) || existsDir(path.join(repoRoot, "themes")));
+
+  const wpContent = isWpContentRoot ? repoRoot : path.join(repoRoot, "wp-content");
   const pluginsDir = path.join(wpContent, "plugins");
   const muPluginsDir = path.join(wpContent, "mu-plugins");
   const themesDir = path.join(wpContent, "themes");
@@ -487,6 +495,7 @@ function main() {
     },
     isWpCoreCheckout,
     isGutenbergRepo,
+    isWpContentRoot,
     hasWpContentDir,
     hasPluginsDir,
     hasThemesDir,

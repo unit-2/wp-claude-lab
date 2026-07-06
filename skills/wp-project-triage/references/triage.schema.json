@@ -31,7 +31,8 @@
               "wp-block-plugin",
               "wp-site",
               "wp-core",
-              "gutenberg"
+              "gutenberg",
+              "wp-content-root"
             ]
           }
         },
