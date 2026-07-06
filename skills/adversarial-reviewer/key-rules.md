@@ -26,6 +26,6 @@
 ## 確認完了後
 
 ```bash
-touch /tmp/wp-review-ok-$(echo "$PWD" | md5 -q 2>/dev/null || echo "$PWD" | md5sum | cut -c1-8)
+bash bin/wp-review.sh <target>
 git commit -m "..."
 ```

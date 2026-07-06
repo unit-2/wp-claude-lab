@@ -1,5 +1,5 @@
 #!/bin/bash
-# コミット前レビューフローをワンコマンドで実行する
+# コミット前レビューフローをワンコマンドで実行する（レビューゲート v2）
 #
 # 使い方:
 #   bash bin/wp-review.sh <target>
@@ -7,9 +7,14 @@
 # 例:
 #   bash bin/wp-review.sh themes/vga
 #   bash bin/wp-review.sh plugins/my-plugin
+#
+# staged 内容のダイジェストと確認時刻をフラグに記録する。pre-git-commit.sh は
+# このフラグの digest が staged 内容と一致し、かつ TTL 内であることを確認してからコミットを許可する。
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WP_CONTENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+# shellcheck source=lib/review-flag.sh
+source "$WP_CONTENT_DIR/.claude/hooks/lib/review-flag.sh"
 
 TARGET="${1:-}"
 
@@ -25,12 +30,19 @@ if [[ ! -d "$TARGET_PATH" ]]; then
   exit 1
 fi
 
+cd "$WP_CONTENT_DIR" || exit 1
+
+if [[ -z "$(git diff --cached)" ]]; then
+  echo "エラー: staged された変更がありません。git add してから実行してください。"
+  exit 1
+fi
+
 echo "=== [wp-review] コミット前チェック: $TARGET ==="
 echo ""
 
 # 1. phpstan
 echo "▶ phpstan を実行中..."
-cd "$WP_CONTENT_DIR" && composer run phpstan "$TARGET"
+composer run phpstan "$TARGET"
 PHPSTAN_EXIT=$?
 
 if [[ $PHPSTAN_EXIT -ne 0 ]]; then
@@ -57,10 +69,13 @@ if [[ "$CONFIRMED" != "y" && "$CONFIRMED" != "Y" ]]; then
   exit 1
 fi
 
-# 3. フラグを立てる
-PROJECT_HASH=$(echo "$WP_CONTENT_DIR" | md5 -q 2>/dev/null || echo "$WP_CONTENT_DIR" | md5sum | cut -c1-8)
-FLAG="/tmp/wp-review-ok-${PROJECT_HASH}"
-touch "$FLAG"
+# 3. フラグに digest + 確認時刻を書き込む
+FLAG="$(review_flag_path)"
+if [[ -z "$FLAG" ]]; then
+  echo "エラー: git リポジトリ内で実行してください。"
+  exit 1
+fi
+printf '%s\n%s\n' "$(staged_digest)" "$(date +%s)" > "$FLAG"
 
 echo ""
 echo "✅ レビュー確認済み。git commit を実行できます。"

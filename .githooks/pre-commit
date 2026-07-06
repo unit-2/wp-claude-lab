@@ -1,6 +1,9 @@
 #!/bin/sh
 
 # main / master への直接コミットを警告する
+#
+# ローカル用の第一防衛線。/dev/tty 依存のため CI では動作しない。
+# 正式なブランチ保護は GitHub Branch Protection で行う。
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 PROTECTED="main master"

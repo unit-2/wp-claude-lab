@@ -27,10 +27,14 @@ if [[ "$FILE_PATH" =~ \.(html|js|mjs|scss)$ ]]; then
     # SCSS: stylelint → prettier の順（stylelintで修正後にprettierで整形）
     if [[ "$FILE_PATH" =~ \.scss$ ]]; then
       echo "[format] stylelint: $FILE_PATH" >&2
-      cd "$PKG_DIR" && npx stylelint --fix "$FILE_PATH" 2>&1 | grep -v "^$" >&2 || true
+      if ! (cd "$PKG_DIR" && npx stylelint --fix "$FILE_PATH") 2>&1 | grep -v "^$" >&2; then
+        echo "[warn] stylelint failed: $FILE_PATH" >&2
+      fi
     fi
     echo "[format] prettier: $FILE_PATH" >&2
-    cd "$PKG_DIR" && npx prettier --write "$FILE_PATH" 2>&1 | grep -v "^$" >&2 || true
+    if ! (cd "$PKG_DIR" && npx prettier --write "$FILE_PATH") 2>&1 | grep -v "^$" >&2; then
+      echo "[warn] prettier failed: $FILE_PATH" >&2
+    fi
   fi
   exit 0
 fi
@@ -49,7 +53,30 @@ if [[ "$FILE_PATH" =~ \.php$ ]]; then
 
   if [ -n "$COMPOSER_DIR" ]; then
     echo "[format] php-lint: $FILE_PATH" >&2
-    cd "$COMPOSER_DIR" && composer run php-lint "$FILE_PATH" 2>&1 >&2 || true
+
+    FILE_HASH=$(echo -n "$FILE_PATH" | md5 -q 2>/dev/null || echo -n "$FILE_PATH" | md5sum | cut -d' ' -f1)
+    RETRY_COUNTER="/tmp/wp-lint-retry-${FILE_HASH}"
+
+    LINT_OUTPUT=$(cd "$COMPOSER_DIR" && composer run php-lint "$FILE_PATH" 2>&1)
+    LINT_EXIT=$?
+
+    if [[ $LINT_EXIT -eq 0 ]]; then
+      rm -f "$RETRY_COUNTER"
+      exit 0
+    fi
+
+    FAIL_COUNT=$(( $(cat "$RETRY_COUNTER" 2>/dev/null || echo 0) + 1 ))
+    echo "$FAIL_COUNT" > "$RETRY_COUNTER"
+
+    echo "$LINT_OUTPUT" >&2
+
+    if (( FAIL_COUNT > 3 )); then
+      echo "[warn] php-lint failed ${FAIL_COUNT} 回目のため警告のみに降格します: $FILE_PATH" >&2
+      exit 0
+    fi
+
+    echo "[error] php-lint failed (${FAIL_COUNT}/3): $FILE_PATH" >&2
+    exit 2
   fi
   exit 0
 fi

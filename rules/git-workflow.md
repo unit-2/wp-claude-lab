@@ -14,7 +14,7 @@ fix: resolve nonce verification failure on post save [MYSITE-43]
 feat: ニュースCPTを追加 [MYSITE-42]
 ```
 
-## コミット前チェックフロー
+## コミット前チェックフロー（レビューゲート v2）
 
 `git commit` を実行しようとすると、フックが自動的にブロックする。以下の手順で進めること：
 
@@ -27,6 +27,15 @@ bash bin/wp-review.sh <target>
 git commit -m "feat: ..."
 ```
 
+確認フラグには「staged 内容のダイジェスト + 確認時刻」を記録する。以下のいずれかに該当すると
+フラグは失効し、`bin/wp-review.sh` からの再レビューが必要になる：
+
+- **TTL超過**：レビュー確認から既定3日（環境変数 `WP_REVIEW_TTL` で秒数指定して変更可）が経過した
+- **staged 内容の変更**：レビュー確認後に `git add` 等で staged 内容を変更した（digest が一致しなくなる）
+
+コミット自体が失敗した場合は、staged 内容を変更しない限り同じフラグで再度 `git commit` を実行できる
+（フラグはコミット成功時に削除せず、staged が空になることで自然に不一致＝失効する）。
+
 > **フォールバック**：`bin/wp-review.sh` が使えない環境では、以下を手動で行う。
 > ```bash
 > # 1. phpstan を実行してエラーゼロを確認
@@ -34,10 +43,10 @@ git commit -m "feat: ..."
 >
 > # 2. adversarial-reviewer スキルでコードをレビュー（Claude Codeで実行）
 >
-> # 3. レビュー完了後、確認フラグを立てる
-> #    PROJECT_HASH は以下で確認できる
-> echo "$PWD" | md5 -q 2>/dev/null || echo "$PWD" | md5sum | cut -c1-8
-> touch /tmp/wp-review-ok-<PROJECT_HASH>
+> # 3. レビュー完了後、確認フラグを立てる（v2 形式: 1行目 digest, 2行目 UNIX時刻）
+> PROJECT_HASH=$(git rev-parse --show-toplevel | md5 -q 2>/dev/null || git rev-parse --show-toplevel | md5sum | cut -d' ' -f1)
+> DIGEST=$(git diff --cached | shasum -a 256 2>/dev/null | cut -d' ' -f1 || git diff --cached | sha256sum | cut -d' ' -f1)
+> printf '%s\n%s\n' "$DIGEST" "$(date +%s)" > "/tmp/wp-review-ok-${PROJECT_HASH}"
 > ```
 
 ## コミットメッセージ形式
