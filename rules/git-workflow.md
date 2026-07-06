@@ -27,6 +27,9 @@ bash bin/wp-review.sh <target>
 git commit -m "feat: ..."
 ```
 
+チェックリストの確認（手順1の一部）は `adversarial-code-reviewer` エージェントに依頼する
+（独立したコンテキストでコードを敵対的にレビューし、CRITICAL・HIGH の有無を判定する）。
+
 確認フラグには「staged 内容のダイジェスト + 確認時刻」を記録する。以下のいずれかに該当すると
 フラグは失効し、`bin/wp-review.sh` からの再レビューが必要になる：
 

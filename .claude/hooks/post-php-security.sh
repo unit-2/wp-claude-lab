@@ -23,6 +23,7 @@ if [ ${#FOUND[@]} -gt 0 ]; then
   KEYWORDS=$(IFS=', '; echo "${FOUND[*]}")
   echo "[security-alert] $FILE_PATH にセキュリティ関連キーワード: $KEYWORDS"
   echo "security-review スキルを使ってセキュリティ確認を行ってください。"
+  echo "security-reviewer エージェントに検査を依頼してください。"
   echo ""
   [[ -f "$SKILLS_DIR/security-review/key-rules.md" ]] && cat "$SKILLS_DIR/security-review/key-rules.md"
 fi
