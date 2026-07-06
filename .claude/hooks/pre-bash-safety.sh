@@ -1,6 +1,9 @@
 #!/bin/bash
 # PreToolUse: Bash
 # 危険なコマンドをブロックする安全ガード
+#
+# 検出限界: `rm -rf` のような単一トークンの組み合わせのみを検出する。
+# `rm -r -f`（フラグを分離した形）や `find <path> -delete` は検出しない。
 
 INPUT=$(cat)
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
