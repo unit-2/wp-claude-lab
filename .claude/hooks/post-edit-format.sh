@@ -54,6 +54,11 @@ if [[ "$FILE_PATH" =~ \.php$ ]]; then
   done
 
   if [ -n "$COMPOSER_DIR" ]; then
+    if ! command -v composer >/dev/null 2>&1; then
+      echo "[warn] composer が見つからないため php-lint をスキップします: $FILE_PATH" >&2
+      exit 0
+    fi
+
     echo "[format] php-lint: $FILE_PATH" >&2
 
     FILE_HASH=$(echo -n "$FILE_PATH" | md5 -q 2>/dev/null || echo -n "$FILE_PATH" | md5sum | cut -d' ' -f1)

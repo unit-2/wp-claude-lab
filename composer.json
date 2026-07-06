@@ -28,6 +28,7 @@
     "php-compatibility": "vendor/bin/phpcs --standard=PHPCompatibilityWP --runtime-set testVersion 8.1",
     "phpstan": "vendor/bin/phpstan analyse -c config/phpstan/phpstan.neon.dist --memory-limit=1G",
     "phpstan:baseline": "vendor/bin/phpstan analyse -c config/phpstan/phpstan.neon.dist --memory-limit=1G --generate-baseline=config/phpstan/phpstan-baseline.neon",
-    "test": "vendor/bin/phpunit"
+    "test": "vendor/bin/phpunit",
+    "test:hooks": "bash -c 'command -v bats >/dev/null 2>&1 && bats tests/hooks/ || echo \"[skip] bats-core が見つかりません。brew install bats-core または npm i -g bats で導入してください\"'"
   }
 }
