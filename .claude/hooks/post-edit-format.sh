@@ -13,13 +13,14 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # prettier / stylelint 対象（theme.json / assets/ は .prettierignore で除外済み）
 if [[ "$FILE_PATH" =~ \.(html|js|mjs|scss)$ ]]; then
   # prettier がインストールされているテーマ・プラグインのルートを探す
-  DIR="$(dirname "$FILE_PATH")"
+  DIR="$(cd "$(dirname "$FILE_PATH")" && pwd)"
   PKG_DIR=""
-  while [ "$DIR" != "/" ] && [ "$DIR" != "." ]; do
+  while true; do
     if [ -f "$DIR/package.json" ] && [ -d "$DIR/node_modules" ]; then
       PKG_DIR="$DIR"
       break
     fi
+    [ "$DIR" = "/" ] && break
     DIR="$(dirname "$DIR")"
   done
 
@@ -41,13 +42,14 @@ fi
 
 # PHP: php-lint（composer.json があるルートで実行）
 if [[ "$FILE_PATH" =~ \.php$ ]]; then
-  DIR="$(dirname "$FILE_PATH")"
+  DIR="$(cd "$(dirname "$FILE_PATH")" && pwd)"
   COMPOSER_DIR=""
-  while [ "$DIR" != "/" ] && [ "$DIR" != "." ]; do
+  while true; do
     if [ -f "$DIR/composer.json" ]; then
       COMPOSER_DIR="$DIR"
       break
     fi
+    [ "$DIR" = "/" ] && break
     DIR="$(dirname "$DIR")"
   done
 
