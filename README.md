@@ -157,7 +157,7 @@ node skills/wp-project-triage/scripts/detect_wp_project.mjs
 - **staged 内容の変更**: レビュー確認後に `git add` 等で staged 内容が変わり、digest が一致しなくなった
 
 これにより「レビューした変更」と「実際にコミットする変更」が常に一致することを保証します
-（`docs/plans/hooks-design.md` §4-A、`tests/hooks/pre-git-commit.bats` の9ケースで検証済み）。
+（`tests/hooks/pre-git-commit.bats` の9ケースで検証済み）。
 
 **(2) 知識は必要なときだけロードする**
 
@@ -286,7 +286,6 @@ wp-content/
 ├── bin/
 │   └── wp-review.sh           ← コミット前チェックの一括実行スクリプト
 ├── tests/                     ← PHPUnit テスト（Brain Monkey）
-├── docs/plans/                ← 設計文書・実装指示書（handoff/）
 ├── config/
 │   ├── phpcs/phpcs.xml.dist   ← PHPCS 設定
 │   └── phpstan/               ← PHPStan 設定 + ベースライン
@@ -304,5 +303,4 @@ wp-content/
 
 - `AGENTS.md` — Claude Code 向けの行動規範（開発プロトコル・スキル呼び出しタイミング）
 - `rules/` — PHP・WordPress・セキュリティ・テスト・Git ワークフローの規約
-- `docs/plans/` — 設計文書（背景・判断理由）と実装指示書（`handoff/`）
 - English README: `README.en.md`（準備中）
